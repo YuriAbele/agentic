@@ -401,7 +401,7 @@ figure.diagram .diagram-src { margin: 0; border: 0; border-radius: 0; }
 .diagram-out svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 .mm-dark { display: none; }
 .diagram-error { padding: 8px 14px; border-top: 1px solid var(--border); color: var(--danger); font-size: 0.85rem; }
-dialog.diagram-dialog { width: min(96vw, 1800px); max-width: none; max-height: 92vh; padding: 0; overflow: hidden;
+dialog.diagram-dialog { width: 96vw; max-width: none; max-height: 92vh; padding: 0; overflow: hidden;
   background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; }
 dialog.diagram-dialog[open] { display: flex; flex-direction: column; }
 dialog.diagram-dialog::backdrop { background: var(--backdrop); }
@@ -410,9 +410,9 @@ dialog.diagram-dialog::backdrop { background: var(--backdrop); }
 .dialog-close { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
   border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; }
 .dialog-close:hover { background: var(--hover); color: var(--text); }
-.dialog-body { overflow: auto; padding: 24px; }
+.dialog-body { overflow: auto; padding: 24px; flex: 1; min-height: 0; }
 .dialog-body .diagram-out { padding: 0; overflow: visible; }
-.dialog-body .diagram-out svg { max-width: none; width: 100%; min-width: 900px; }
+.dialog-body .diagram-out svg { max-width: none !important; width: 100% !important; height: auto; }
 .print-notice { position: fixed; z-index: 40; left: 50%; bottom: 20px; transform: translateX(-50%);
   width: max-content; max-width: calc(100vw - 32px); display: flex; align-items: center; gap: 10px;
   padding: 10px 8px 10px 16px; background: var(--surface); color: var(--text); border: 1px solid var(--border);
