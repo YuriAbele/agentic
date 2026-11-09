@@ -5,7 +5,7 @@ compatibility: Requires Python 3.8+ with the "markdown" package (pip install mar
 allowed-tools: Bash(python:*) Bash(py:*) Bash(pip:*)
 metadata:
   author: yuab
-  version: "1.1"
+  version: "1.2"
 ---
 
 # Markdown to HTML
@@ -47,8 +47,9 @@ The script prints exactly one line:
 Use this to answer questions about the output without opening it:
 
 - Dark header with title, subtitle, search (Ctrl+K, Enter / Shift+Enter between matches, Esc clears), Print / PDF button and a System / Light / Dark theme switcher (System is the default; the choice is remembered in the browser).
-- Left sidebar built from three heading levels, collapsible, highlights the current section while scrolling; slide-in menu on narrow screens.
-- Each top-level section as a card; styled tables, code, quotes; local images embedded; print styles without header and sidebar.
+- Left sidebar built from three heading levels, collapsible, highlights the current section while scrolling; slide-in menu on narrow screens. A button at its top right hides it; the content then spans the full window width, and a button pinned to the left edge below the header brings it back.
+- Each top-level section as a card; a Full width button in the header widens the cards to the whole content area. The sidebar and width choices are remembered in the browser like the theme.
+- Styled tables, code, quotes; local images embedded; print styles without header and sidebar.
 - ` ```mermaid ` code blocks rendered as diagrams in matching light and dark colors, with an Enlarge button. The bundled `assets/mermaid.min.js` (Mermaid 11.17.2, MIT) is embedded only when the document has diagrams, adding about 3.5 MB. A diagram with a syntax error stays visible as code with an error note; the `OK:` line reports the number of diagrams.
 - UI labels for `de en ru uk fr es it`; other codes fall back to English.
 

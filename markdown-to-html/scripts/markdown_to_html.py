@@ -3,8 +3,8 @@
 markdown_to_html.py - convert a Markdown file into one self-contained HTML page.
 
 Page: dark header (title, search with Ctrl+K, print button, theme switcher
-System / Light / Dark), collapsible left navigation with scroll spy, sections
-as cards, print styles, responsive slide-in menu on small screens.
+System / Light / Dark, full-width toggle), collapsible and hideable left
+navigation with scroll spy, sections as cards, print styles, responsive slide-in menu on small screens.
 
 Usage:
     python markdown_to_html.py <markdown-file> <language-code> [output-file]
@@ -40,43 +40,50 @@ LABELS = {
            "menu": "Table of contents", "theme": "Theme", "system": "System", "light": "Light",
            "dark": "Dark", "permalink": "Link to this section", "toggle": "Expand or collapse",
            "diagram": "Diagram", "enlarge": "Enlarge", "close": "Close", "diagram_error": "Diagram could not be rendered",
-           "print_blocked": "Printing is blocked by the app that shows this page. Open the HTML file directly in a web browser to print or save it as PDF."},
+           "print_blocked": "Printing is blocked by the app that shows this page. Open the HTML file directly in a web browser to print or save it as PDF.",
+           "nav_hide": "Hide navigation", "nav_show": "Show navigation", "full_width": "Full width"},
     "de": {"search": "Begriff oder ID suchen …", "kbd": "Strg K", "clear": "Suche leeren",
            "print": "Drucken / PDF", "toc": "Im Dokument", "no_results": "Keine Treffer",
            "menu": "Inhaltsverzeichnis", "theme": "Darstellung", "system": "System", "light": "Hell",
            "dark": "Dunkel", "permalink": "Link zu diesem Abschnitt", "toggle": "Auf- oder zuklappen",
            "diagram": "Diagramm", "enlarge": "Vergrößern", "close": "Schließen", "diagram_error": "Diagramm konnte nicht dargestellt werden",
-           "print_blocked": "Die Anwendung, die diese Seite anzeigt, blockiert das Drucken. Öffnen Sie die HTML-Datei direkt im Browser, um sie zu drucken oder als PDF zu speichern."},
+           "print_blocked": "Die Anwendung, die diese Seite anzeigt, blockiert das Drucken. Öffnen Sie die HTML-Datei direkt im Browser, um sie zu drucken oder als PDF zu speichern.",
+           "nav_hide": "Navigation ausblenden", "nav_show": "Navigation einblenden", "full_width": "Volle Breite"},
     "ru": {"search": "Поиск по тексту или ID …", "kbd": "Ctrl K", "clear": "Очистить поиск",
            "print": "Печать / PDF", "toc": "В документе", "no_results": "Ничего не найдено",
            "menu": "Оглавление", "theme": "Тема", "system": "Системная", "light": "Светлая",
            "dark": "Тёмная", "permalink": "Ссылка на раздел", "toggle": "Развернуть или свернуть",
            "diagram": "Диаграмма", "enlarge": "Увеличить", "close": "Закрыть", "diagram_error": "Не удалось отрисовать диаграмму",
-           "print_blocked": "Приложение, в котором открыта страница, блокирует печать. Откройте HTML-файл напрямую в браузере, чтобы распечатать его или сохранить в PDF."},
+           "print_blocked": "Приложение, в котором открыта страница, блокирует печать. Откройте HTML-файл напрямую в браузере, чтобы распечатать его или сохранить в PDF.",
+           "nav_hide": "Скрыть навигацию", "nav_show": "Показать навигацию", "full_width": "На всю ширину"},
     "uk": {"search": "Пошук за текстом або ID …", "kbd": "Ctrl K", "clear": "Очистити пошук",
            "print": "Друк / PDF", "toc": "У документі", "no_results": "Нічого не знайдено",
            "menu": "Зміст", "theme": "Тема", "system": "Системна", "light": "Світла",
            "dark": "Темна", "permalink": "Посилання на розділ", "toggle": "Розгорнути або згорнути",
            "diagram": "Діаграма", "enlarge": "Збільшити", "close": "Закрити", "diagram_error": "Не вдалося відобразити діаграму",
-           "print_blocked": "Застосунок, у якому відкрито сторінку, блокує друк. Відкрийте HTML-файл безпосередньо в браузері, щоб надрукувати його або зберегти у PDF."},
+           "print_blocked": "Застосунок, у якому відкрито сторінку, блокує друк. Відкрийте HTML-файл безпосередньо в браузері, щоб надрукувати його або зберегти у PDF.",
+           "nav_hide": "Сховати навігацію", "nav_show": "Показати навігацію", "full_width": "На всю ширину"},
     "fr": {"search": "Rechercher un terme ou un ID …", "kbd": "Ctrl K", "clear": "Effacer la recherche",
            "print": "Imprimer / PDF", "toc": "Dans ce document", "no_results": "Aucun résultat",
            "menu": "Table des matières", "theme": "Thème", "system": "Système", "light": "Clair",
            "dark": "Sombre", "permalink": "Lien vers cette section", "toggle": "Déplier ou replier",
            "diagram": "Diagramme", "enlarge": "Agrandir", "close": "Fermer", "diagram_error": "Impossible d’afficher le diagramme",
-           "print_blocked": "L’application qui affiche cette page bloque l’impression. Ouvrez le fichier HTML directement dans un navigateur pour l’imprimer ou l’enregistrer en PDF."},
+           "print_blocked": "L’application qui affiche cette page bloque l’impression. Ouvrez le fichier HTML directement dans un navigateur pour l’imprimer ou l’enregistrer en PDF.",
+           "nav_hide": "Masquer la navigation", "nav_show": "Afficher la navigation", "full_width": "Pleine largeur"},
     "es": {"search": "Buscar término o ID …", "kbd": "Ctrl K", "clear": "Borrar búsqueda",
            "print": "Imprimir / PDF", "toc": "En este documento", "no_results": "Sin resultados",
            "menu": "Índice", "theme": "Tema", "system": "Sistema", "light": "Claro",
            "dark": "Oscuro", "permalink": "Enlace a esta sección", "toggle": "Expandir o contraer",
            "diagram": "Diagrama", "enlarge": "Ampliar", "close": "Cerrar", "diagram_error": "No se pudo mostrar el diagrama",
-           "print_blocked": "La aplicación que muestra esta página bloquea la impresión. Abra el archivo HTML directamente en un navegador para imprimirlo o guardarlo como PDF."},
+           "print_blocked": "La aplicación que muestra esta página bloquea la impresión. Abra el archivo HTML directamente en un navegador para imprimirlo o guardarlo como PDF.",
+           "nav_hide": "Ocultar navegación", "nav_show": "Mostrar navegación", "full_width": "Ancho completo"},
     "it": {"search": "Cerca termine o ID …", "kbd": "Ctrl K", "clear": "Cancella ricerca",
            "print": "Stampa / PDF", "toc": "In questo documento", "no_results": "Nessun risultato",
            "menu": "Indice", "theme": "Tema", "system": "Sistema", "light": "Chiaro",
            "dark": "Scuro", "permalink": "Link a questa sezione", "toggle": "Espandi o comprimi",
            "diagram": "Diagramma", "enlarge": "Ingrandisci", "close": "Chiudi", "diagram_error": "Impossibile visualizzare il diagramma",
-           "print_blocked": "L’applicazione che mostra questa pagina blocca la stampa. Apri il file HTML direttamente in un browser per stamparlo o salvarlo come PDF."},
+           "print_blocked": "L’applicazione che mostra questa pagina blocca la stampa. Apri il file HTML direttamente in un browser per stamparlo o salvarlo come PDF.",
+           "nav_hide": "Nascondi navigazione", "nav_show": "Mostra navigazione", "full_width": "Larghezza piena"},
 }
 
 # Names of hand-written tables of contents; such a section is dropped
@@ -173,6 +180,17 @@ ICON_MENU = ('<svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"
              'stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>')
 ICON_CLOSE = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" '
               'stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>')
+ICON_NAV_HIDE = ('<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><rect x="2.5" y="3.5" width="15" '
+                 'height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 3.5v13'
+                 'M13.5 7.5 11 10l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" '
+                 'stroke-linejoin="round"/></svg>')
+ICON_NAV_SHOW = ('<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><rect x="2.5" y="3.5" width="15" '
+                 'height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7.5 3.5v13'
+                 'M11 7.5l2.5 2.5-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" '
+                 'stroke-linejoin="round"/></svg>')
+ICON_WIDTH = ('<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M2.5 4v12M17.5 4v12M5.5 10h9'
+              'M8 7.5 5.5 10 8 12.5M12 7.5l2.5 2.5-2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" '
+              'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 
 LIGHT_TOKENS = """
   color-scheme: light;
@@ -291,7 +309,10 @@ button, input { font: inherit; color: inherit; }
 .actions { display: flex; align-items: center; gap: 12px; flex: none; }
 .btn-print { display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 16px;
   border: 1px solid var(--header-line); border-radius: 8px; background: transparent; cursor: pointer; white-space: nowrap; }
-.btn-print:hover, .menu-btn:hover { background: var(--header-chip); }
+.btn-width { width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--header-line); border-radius: 8px; background: transparent; cursor: pointer; }
+.btn-width[aria-pressed="true"] { background: var(--header-chip); border-color: var(--header-muted); }
+.btn-print:hover, .menu-btn:hover, .btn-width:hover { background: var(--header-chip); }
 .theme-switch { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--header-line); border-radius: 9px; }
 .theme-switch button { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
   border: 0; border-radius: 6px; background: transparent; color: var(--header-muted); cursor: pointer; }
@@ -303,7 +324,17 @@ button, input { font: inherit; color: inherit; }
 .sidebar { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto;
   padding: 26px 14px 48px 22px; background: var(--sidebar); border-right: 1px solid var(--border);
   scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-.toc-head { margin: 0 0 14px 14px; font-size: 0.92rem; color: var(--muted); }
+.toc-top { position: sticky; top: -26px; z-index: 2; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin: -26px -14px 6px -22px; padding: 14px 10px 8px 36px; background: var(--sidebar); }
+.toc-head { margin: 0; font-size: 0.92rem; color: var(--muted); }
+.nav-hide { flex: none; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; }
+.nav-hide:hover { background: var(--hover); color: var(--text); }
+.nav-show { display: none; position: fixed; z-index: 15; left: 0; top: calc(var(--header-h) + 16px); width: 42px; height: 42px;
+  align-items: center; justify-content: center; padding: 0; background: var(--surface); color: var(--muted);
+  border: 1px solid var(--border); border-left: 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer; }
+.nav-show:hover { background: var(--hover); color: var(--text); }
 .toc-list { list-style: none; margin: 0; padding: 0; }
 .toc-list .toc-list { display: none; margin: 4px 0 10px 26px; padding-left: 8px; border-left: 1px solid var(--border); }
 li.open > .toc-list { display: block; }
@@ -394,6 +425,15 @@ dialog.diagram-dialog::backdrop { background: var(--backdrop); }
 mark.hit { background: var(--mark); color: var(--mark-text); border-radius: 3px; padding: 0 1px; }
 mark.hit.current { background: var(--mark-current); box-shadow: 0 0 0 2px var(--mark-current); }
 
+/* Full-width cards; hidden navigation (wide screens only, the slide-in menu is unaffected) */
+:root[data-width="full"] .card { max-width: none; }
+@media screen and (min-width: 901px) {
+  :root[data-nav="closed"] .layout { grid-template-columns: minmax(0, 1fr); }
+  :root[data-nav="closed"] .sidebar { display: none; }
+  :root[data-nav="closed"] .nav-show { display: inline-flex; }
+  :root[data-nav="closed"] main { padding-left: 64px; padding-right: 64px; }
+}
+
 /* Small screens */
 @media (max-width: 1100px) {
   .btn-print .label { display: none; }
@@ -407,6 +447,7 @@ mark.hit.current { background: var(--mark-current); box-shadow: 0 0 0 2px var(--
   .doc-sub { font-size: 0.8rem; }
   .actions { gap: 8px; }
   .btn-print { height: 42px; width: 42px; }
+  .btn-width { display: none; }
   .theme-switch button { width: 34px; height: 34px; }
   .search { order: 5; flex: 1 1 100%; max-width: none; margin-left: 0; }
   .search input { padding-right: 110px; }
@@ -429,7 +470,7 @@ mark.hit.current { background: var(--mark-current); box-shadow: 0 0 0 2px var(--
 @media print {
   html:root:not(.x) {__LIGHT__}
   body { background: #fff; font-size: 11pt; }
-  .topbar, .sidebar, .backdrop { display: none !important; }
+  .topbar, .sidebar, .backdrop, .nav-show { display: none !important; }
   .layout { display: block; }
   main { padding: 0; }
   .card { max-width: none; margin: 0 0 1.5em; padding: 0; border: 0; border-radius: 0; }
@@ -569,9 +610,46 @@ JS = r"""
         if (hasChildren(li) && !li.classList.contains("open")) setOpen(li, true, "data-auto");
       });
     }
-    var nr = nav.getBoundingClientRect(), lr = link.getBoundingClientRect();
-    if (lr.top < nr.top + 40 || lr.bottom > nr.bottom - 40) nav.scrollTop += lr.top - nr.top - nr.height / 3;
+    reveal(link);
   }
+  function reveal(link) {
+    if (!link || !nav.offsetHeight) return;
+    var nr = nav.getBoundingClientRect(), lr = link.getBoundingClientRect();
+    var sticky = nav.querySelector(".toc-top").offsetHeight - 26; /* part of the nav header that covers the list */
+    if (lr.top < nr.top + sticky + 8 || lr.bottom > nr.bottom - 40) nav.scrollTop += lr.top - nr.top - Math.max(sticky + 24, nr.height / 3);
+  }
+
+  /* Hide / show the navigation and full-width cards; both remembered in the browser.
+     On narrow screens the hide button simply closes the slide-in menu. */
+  var navHide = nav.querySelector(".nav-hide"), navShow = document.querySelector(".nav-show");
+  var widthBtn = document.querySelector(".btn-width");
+  function remember(key, value) {
+    try { if (value) localStorage.setItem(key, value); else localStorage.removeItem(key); } catch (e) {}
+  }
+  function setNavClosed(closed) {
+    if (closed) root.setAttribute("data-nav", "closed"); else root.removeAttribute("data-nav");
+    remember("md2html-nav", closed ? "closed" : "");
+  }
+  navHide.addEventListener("click", function () {
+    if (mqMobile.matches) { closeMenu(); menuBtn.focus(); return; }
+    setNavClosed(true);
+    navShow.focus();
+  });
+  navShow.addEventListener("click", function () {
+    setNavClosed(false);
+    navHide.focus({ preventScroll: true });
+    reveal(current);
+  });
+  function setWide(on) {
+    if (on) root.setAttribute("data-width", "full"); else root.removeAttribute("data-width");
+    widthBtn.setAttribute("aria-pressed", String(on));
+  }
+  setWide(root.getAttribute("data-width") === "full");
+  widthBtn.addEventListener("click", function () {
+    var on = root.getAttribute("data-width") !== "full";
+    setWide(on);
+    remember("md2html-width", on ? "full" : "");
+  });
   var ticking = false;
   function spy() {
     ticking = false;
@@ -847,7 +925,7 @@ PAGE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="markdown_to_html.py">
 <title>__TITLE_TEXT__</title>
-<script>(function(){try{var t=localStorage.getItem("md2html-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<script>(function(){try{var d=document.documentElement,s=localStorage,t=s.getItem("md2html-theme");if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(s.getItem("md2html-nav")==="closed")d.setAttribute("data-nav","closed");if(s.getItem("md2html-width")==="full")d.setAttribute("data-width","full");}catch(e){}})();</script>
 <style>__CSS__</style>
 </head>
 <body data-top="__TOP__">
@@ -866,6 +944,7 @@ PAGE = """<!DOCTYPE html>
     </div>
   </div>
   <div class="actions">
+    <button class="btn-width" type="button" aria-pressed="false" aria-label="__L_FULL_WIDTH__" title="__L_FULL_WIDTH__">__ICON_WIDTH__</button>
     <button class="btn-print" type="button" title="__L_PRINT__">__ICON_PRINT__<span class="label">__L_PRINT__</span></button>
     <div class="theme-switch" role="radiogroup" aria-label="__L_THEME__">
       <button type="button" role="radio" data-value="system" aria-checked="true" aria-label="__L_SYSTEM__" title="__L_SYSTEM__">__ICON_SYSTEM__</button>
@@ -874,9 +953,13 @@ PAGE = """<!DOCTYPE html>
     </div>
   </div>
 </header>
+<button class="nav-show" type="button" aria-controls="sidebar" aria-label="__L_NAV_SHOW__" title="__L_NAV_SHOW__">__ICON_NAV_SHOW__</button>
 <div class="layout">
   <nav class="sidebar" id="sidebar" aria-label="__L_MENU__">
-    <p class="toc-head">__L_TOC__</p>
+    <div class="toc-top">
+      <p class="toc-head">__L_TOC__</p>
+      <button class="nav-hide" type="button" aria-controls="sidebar" aria-label="__L_NAV_HIDE__" title="__L_NAV_HIDE__">__ICON_NAV_HIDE__</button>
+    </div>
     __NAV__
     <p class="toc-empty" hidden>__L_NO_RESULTS__</p>
   </nav>
@@ -993,6 +1076,8 @@ def convert(src, lang, dst):
         "__L_TOC__": lab["toc"], "__L_NO_RESULTS__": lab["no_results"],
         "__L_DIAGRAM__": lab["diagram"], "__L_CLOSE__": lab["close"],
         "__L_PRINT_BLOCKED__": lab["print_blocked"],
+        "__ICON_NAV_HIDE__": ICON_NAV_HIDE, "__ICON_NAV_SHOW__": ICON_NAV_SHOW, "__ICON_WIDTH__": ICON_WIDTH,
+        "__L_NAV_HIDE__": lab["nav_hide"], "__L_NAV_SHOW__": lab["nav_show"], "__L_FULL_WIDTH__": lab["full_width"],
     }.items():
         out = out.replace(key, value)
     body_html = "\n".join(cards).replace("__L_ENLARGE__", lab["enlarge"])

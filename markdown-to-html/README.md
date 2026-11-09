@@ -59,9 +59,9 @@ Examples:
 
 - **Header** with title, subtitle, search field, print button and theme switcher.
 - **Themes:** System (default), Light, Dark. The choice is remembered in the browser; printing always uses the light theme.
-- **Sidebar** built from three heading levels: collapsible sections, current section highlighted while scrolling, permalink anchors.
+- **Sidebar** built from three heading levels: collapsible sections, current section highlighted while scrolling, permalink anchors. The button at its top right hides it, and the content then uses the full window width; a button pinned to the left edge below the header shows it again. The choice is remembered in the browser.
 - **Search** across the whole text: highlighted matches, counter, Enter / Shift+Enter between matches, sidebar filtered to matching sections. Ctrl+K focuses, Esc clears.
-- **Cards** for top-level sections; styled tables (horizontal scroll when wide), code blocks and quotes.
+- **Cards** for top-level sections; styled tables (horizontal scroll when wide), code blocks and quotes. The **Full width** button in the header widens the cards from reading width to the whole content area (remembered in the browser).
 - **Mobile:** the sidebar becomes a slide-in menu.
 - **Print / PDF:** no header or sidebar, no breaks inside tables and code, external links printed with their URL. When the page is shown in a sandboxed frame that blocks printing (editor previews, chat viewers), the button reopens it in a new tab that prints itself, or, if popups are blocked as well, shows a hint to open the file in a browser.
 - **Mermaid diagrams:** ` ```mermaid ` code blocks become diagrams, drawn in matching colors for the light and the dark theme, with an Enlarge button that opens the diagram full width. The library is embedded only when the document contains diagrams (about 3.5 MB extra), so the page still works offline. A diagram with a syntax error is shown as code with an error note.
