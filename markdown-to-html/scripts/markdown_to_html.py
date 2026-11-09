@@ -856,11 +856,39 @@ JS = r"""
       er: { useMaxWidth: true }, gantt: { useMaxWidth: true }, class: { useMaxWidth: true }, state: { useMaxWidth: true }
     };
   }
+  /* Sequence-diagram `rect rgb(...)` blocks carry a hard-coded light inline fill that theme
+     variables cannot override. In the dark render, keep the hue but turn it into a faint
+     translucent tint so the light text stays readable. */
+  function darkenRects(svg) {
+    var box = document.createElement("div");
+    box.innerHTML = svg;
+    var probe = document.createElement("span");
+    probe.style.display = "none";
+    document.body.appendChild(probe);
+    box.querySelectorAll("rect.rect").forEach(function (r) {
+      var fill = r.style.fill || r.getAttribute("fill");
+      if (!fill) return;
+      probe.style.color = "";
+      probe.style.color = fill;
+      var m = getComputedStyle(probe).color.match(/[\d.]+/g);
+      if (!m || m.length < 3) return;
+      var R = m[0] / 255, G = m[1] / 255, B = m[2] / 255;
+      var mx = Math.max(R, G, B), mn = Math.min(R, G, B), d = mx - mn, h = 0;
+      if (d > 0) {
+        h = mx === R ? ((G - B) / d) % 6 : mx === G ? (B - R) / d + 2 : (R - G) / d + 4;
+        h = Math.round(((h * 60) + 360) % 360);
+      }
+      /* same hue, forced saturation, low lightness: clearly colored but dark */
+      r.style.fill = "hsl(" + h + ",55%,21%)";
+    });
+    probe.remove();
+    return box.innerHTML;
+  }
   var diagramSeq = 0;
   async function renderSvg(src, dark) {
     window.mermaid.initialize(mermaidConfig(dark));
     var id = "mmd-" + (++diagramSeq);
-    try { return (await window.mermaid.render(id, src)).svg; }
+    try { var svg = (await window.mermaid.render(id, src)).svg; return dark ? darkenRects(svg) : svg; }
     finally { ["d" + id, id].forEach(function (x) { var el = document.getElementById(x); if (el && !el.closest("figure")) el.remove(); }); }
   }
   async function renderDiagrams() {

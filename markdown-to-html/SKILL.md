@@ -5,7 +5,7 @@ compatibility: Requires Python 3.8+ with the "markdown" package (pip install mar
 allowed-tools: Bash(python:*) Bash(py:*) Bash(pip:*)
 metadata:
   author: yuab
-  version: "1.2"
+  version: "1.5"
 ---
 
 # Markdown to HTML
