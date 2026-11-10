@@ -42,7 +42,7 @@ LABELS = {
            "diagram": "Diagram", "enlarge": "Enlarge", "close": "Close", "diagram_error": "Diagram could not be rendered",
            "print_blocked": "Printing is blocked by the app that shows this page. Open the HTML file directly in a web browser to print or save it as PDF.",
            "nav_hide": "Hide navigation", "nav_show": "Show navigation", "full_width": "Full width",
-           "export": "Copy / download", "copy_svg": "Copy as SVG (text)", "dl_svg": "Download as SVG", "dl_png": "Download as PNG image", "copy_png": "Copy as PNG image (for PowerPoint)"},
+           "export": "Copy / download", "copy_svg": "Copy as SVG (text)", "copy_svg_mime": "Copy as SVG (image/svg+xml)", "dl_svg": "Download as SVG", "dl_png": "Download as PNG image", "copy_png": "Copy as PNG image (for PowerPoint)"},
     "de": {"search": "Begriff oder ID suchen …", "kbd": "Strg K", "clear": "Suche leeren",
            "print": "Drucken / PDF", "toc": "Im Dokument", "no_results": "Keine Treffer",
            "menu": "Inhaltsverzeichnis", "theme": "Darstellung", "system": "System", "light": "Hell",
@@ -50,7 +50,7 @@ LABELS = {
            "diagram": "Diagramm", "enlarge": "Vergrößern", "close": "Schließen", "diagram_error": "Diagramm konnte nicht dargestellt werden",
            "print_blocked": "Die Anwendung, die diese Seite anzeigt, blockiert das Drucken. Öffnen Sie die HTML-Datei direkt im Browser, um sie zu drucken oder als PDF zu speichern.",
            "nav_hide": "Navigation ausblenden", "nav_show": "Navigation einblenden", "full_width": "Volle Breite",
-           "export": "Kopieren / Herunterladen", "copy_svg": "Als SVG kopieren (Text)", "dl_svg": "Als SVG herunterladen", "dl_png": "Als PNG-Bild herunterladen", "copy_png": "Als PNG-Bild kopieren (für PowerPoint)"},
+           "export": "Kopieren / Herunterladen", "copy_svg": "Als SVG kopieren (Text)", "copy_svg_mime": "Als SVG kopieren (image/svg+xml)", "dl_svg": "Als SVG herunterladen", "dl_png": "Als PNG-Bild herunterladen", "copy_png": "Als PNG-Bild kopieren (für PowerPoint)"},
     "ru": {"search": "Поиск по тексту или ID …", "kbd": "Ctrl K", "clear": "Очистить поиск",
            "print": "Печать / PDF", "toc": "В документе", "no_results": "Ничего не найдено",
            "menu": "Оглавление", "theme": "Тема", "system": "Системная", "light": "Светлая",
@@ -185,7 +185,8 @@ def _menu_item(act, icon, key):
 DIAGRAM_MENU = ('<span class="diagram-menu"><button class="diagram-menu-btn" type="button" aria-haspopup="menu" '
                 f'aria-expanded="false" title="__L_EXPORT__" aria-label="__L_EXPORT__">{ICON_MENU_DD}</button>'
                 '<span class="diagram-menu-list" role="menu" hidden>'
-                + _menu_item("copy-svg", ICON_COPY, "COPY_SVG") + _menu_item("copy-png", ICON_COPY, "COPY_PNG")
+                + _menu_item("copy-svg", ICON_COPY, "COPY_SVG") + _menu_item("copy-svg-mime", ICON_COPY, "COPY_SVG_MIME")
+                + _menu_item("copy-png", ICON_COPY, "COPY_PNG")
                 + _menu_item("dl-svg", ICON_DOWNLOAD, "DL_SVG") + _menu_item("dl-png", ICON_DOWNLOAD, "DL_PNG")
                 + '</span></span>')
 ICON_CHEVRON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">'
@@ -892,7 +893,8 @@ JS = r"""
     v.fontSize = "15px";
     return {
       startOnLoad: false, securityLevel: "strict", theme: "base", themeVariables: v, suppressErrorRendering: true,
-      flowchart: { htmlLabels: true, useMaxWidth: true }, sequence: { useMaxWidth: true },
+      htmlLabels: false, /* plain SVG text instead of foreignObject, so exported SVGs keep their labels */
+      flowchart: { htmlLabels: false, useMaxWidth: true }, sequence: { useMaxWidth: true },
       er: { useMaxWidth: true }, gantt: { useMaxWidth: true }, class: { useMaxWidth: true }, state: { useMaxWidth: true }
     };
   }
@@ -974,6 +976,28 @@ JS = r"""
     c.setAttribute("width", w);
     c.setAttribute("height", h);
     c.style.maxWidth = "";
+    /* Mermaid styles text and shapes with CSS classes in an embedded <style>, which PowerPoint, Illustrator
+       and similar apps only partly honour (text vanishes). Inline the computed values and drop the <style>. */
+    var props = ["fill", "fill-opacity", "stroke", "stroke-width", "stroke-opacity", "stroke-dasharray", "opacity",
+                 "font-family", "font-size", "font-weight", "font-style", "text-anchor", "letter-spacing", "visibility", "display"];
+    var from = svg.querySelectorAll("*"), to = c.querySelectorAll("*");
+    for (var i = 0; i < from.length; i++) {
+      if (from[i].tagName.toLowerCase() === "style" || !to[i].style) continue;
+      var cs = getComputedStyle(from[i]);
+      for (var j = 0; j < props.length; j++) {
+        var v = cs.getPropertyValue(props[j]);
+        if (v) to[i].style.setProperty(props[j], v);
+      }
+    }
+    c.querySelectorAll("style").forEach(function (s) { s.remove(); });
+    /* apps ignore the CSS background on the root element, so paint it as a rectangle (matters for dark theme) */
+    var bg = getComputedStyle(svg).backgroundColor;
+    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
+      var rc = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rc.setAttribute("x", vb[0] || 0); rc.setAttribute("y", vb[1] || 0);
+      rc.setAttribute("width", w); rc.setAttribute("height", h); rc.setAttribute("fill", bg);
+      c.insertBefore(rc, c.firstChild);
+    }
     return { text: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(c), w: w, h: h,
              bg: getComputedStyle(svg).backgroundColor };
   }
@@ -986,6 +1010,16 @@ JS = r"""
       try { ok = document.execCommand("copy"); } catch (e) {}
       ta.remove();
       if (ok) res(); else rej(new Error("copy"));
+    });
+  }
+  /* Best effort: browsers that refuse the type reject here and the button flashes red. */
+  function copySvgMime(text) {
+    if (!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write)) return Promise.reject(new Error("unsupported"));
+    var svg = new Blob([text], { type: "image/svg+xml" }), plain = new Blob([text], { type: "text/plain" });
+    return Promise.resolve().then(function () {
+      return navigator.clipboard.write([new ClipboardItem({ "image/svg+xml": svg, "text/plain": plain })]);
+    }).catch(function () {
+      return navigator.clipboard.write([new ClipboardItem({ "web image/svg+xml": svg, "text/plain": plain })]);
     });
   }
   function toPng(d) {
@@ -1045,6 +1079,8 @@ JS = r"""
     }
     if (act === "copy-svg") {
       p = copyText(d.text);
+    } else if (act === "copy-svg-mime") {
+      p = copySvgMime(d.text);
     } else if (act === "dl-svg") {
       save(new Blob([d.text], { type: "image/svg+xml" }), ".svg");
       p = Promise.resolve();
@@ -1245,7 +1281,7 @@ def convert(src, lang, dst):
     }.items():
         out = out.replace(key, value)
     # Export menu: in the enlarged-diagram dialog (page template) and in every diagram header (body).
-    menu_labels = (("__L_COPY_SVG__", "copy_svg"), ("__L_DL_SVG__", "dl_svg"), ("__L_COPY_PNG__", "copy_png"),
+    menu_labels = (("__L_COPY_SVG_MIME__", "copy_svg_mime"), ("__L_COPY_SVG__", "copy_svg"), ("__L_DL_SVG__", "dl_svg"), ("__L_COPY_PNG__", "copy_png"),
                    ("__L_DL_PNG__", "dl_png"), ("__L_EXPORT__", "export"))
     out = out.replace("__DIAGRAM_MENU__", DIAGRAM_MENU)
     body_html = "\n".join(cards).replace("__L_ENLARGE__", lab["enlarge"])
