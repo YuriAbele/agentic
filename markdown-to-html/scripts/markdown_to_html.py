@@ -41,14 +41,16 @@ LABELS = {
            "dark": "Dark", "permalink": "Link to this section", "toggle": "Expand or collapse",
            "diagram": "Diagram", "enlarge": "Enlarge", "close": "Close", "diagram_error": "Diagram could not be rendered",
            "print_blocked": "Printing is blocked by the app that shows this page. Open the HTML file directly in a web browser to print or save it as PDF.",
-           "nav_hide": "Hide navigation", "nav_show": "Show navigation", "full_width": "Full width"},
+           "nav_hide": "Hide navigation", "nav_show": "Show navigation", "full_width": "Full width",
+           "export": "Copy / download", "copy_svg": "Copy as SVG (text)", "dl_svg": "Download as SVG", "dl_png": "Download as PNG image", "copy_png": "Copy as PNG image (for PowerPoint)"},
     "de": {"search": "Begriff oder ID suchen …", "kbd": "Strg K", "clear": "Suche leeren",
            "print": "Drucken / PDF", "toc": "Im Dokument", "no_results": "Keine Treffer",
            "menu": "Inhaltsverzeichnis", "theme": "Darstellung", "system": "System", "light": "Hell",
            "dark": "Dunkel", "permalink": "Link zu diesem Abschnitt", "toggle": "Auf- oder zuklappen",
            "diagram": "Diagramm", "enlarge": "Vergrößern", "close": "Schließen", "diagram_error": "Diagramm konnte nicht dargestellt werden",
            "print_blocked": "Die Anwendung, die diese Seite anzeigt, blockiert das Drucken. Öffnen Sie die HTML-Datei direkt im Browser, um sie zu drucken oder als PDF zu speichern.",
-           "nav_hide": "Navigation ausblenden", "nav_show": "Navigation einblenden", "full_width": "Volle Breite"},
+           "nav_hide": "Navigation ausblenden", "nav_show": "Navigation einblenden", "full_width": "Volle Breite",
+           "export": "Kopieren / Herunterladen", "copy_svg": "Als SVG kopieren (Text)", "dl_svg": "Als SVG herunterladen", "dl_png": "Als PNG-Bild herunterladen", "copy_png": "Als PNG-Bild kopieren (für PowerPoint)"},
     "ru": {"search": "Поиск по тексту или ID …", "kbd": "Ctrl K", "clear": "Очистить поиск",
            "print": "Печать / PDF", "toc": "В документе", "no_results": "Ничего не найдено",
            "menu": "Оглавление", "theme": "Тема", "system": "Системная", "light": "Светлая",
@@ -147,7 +149,10 @@ def mermaid_figures(body, label):
         nonlocal count
         count += 1
         return (f'<figure class="diagram"><div class="diagram-bar"><span>{label} {count}</span>'
-                f'<button class="diagram-zoom" type="button" hidden>__L_ENLARGE__</button></div>'
+                f'<span class="diagram-tools" hidden>'
+                f'{DIAGRAM_MENU}'
+                f'<button class="diagram-zoom" type="button" title="__L_ENLARGE__" aria-label="__L_ENLARGE__">{ICON_ENLARGE}</button>'
+                f'</span></div>'
                 f'<pre class="diagram-src">{m.group(1)}</pre><div class="diagram-out" hidden></div></figure>')
     return MERMAID_BLOCK.sub(repl, body), count
 
@@ -161,6 +166,28 @@ def mermaid_script():
     return f"<script>{code}</script>"
 
 
+ICON_COPY = ('<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.8" '
+             'fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M13 7V4.8A1.8 1.8 0 0 0 11.2 3H4.8A1.8 1.8 0 0 0 3 4.8v6.4A1.8 1.8 0 0 0 4.8 13H7" '
+             'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>')
+ICON_DOWNLOAD = ('<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 3v10M6 9.5l4 4 4-4M3.5 16.5h13" '
+                 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>')
+ICON_ENLARGE = ('<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 7.5V3h4.5M3 3l5 5M12.5 3H17v4.5M17 3l-5 5'
+                'M3 12.5V17h4.5M3 17l5-5M17 12.5V17h-4.5M17 17l-5-5" fill="none" stroke="currentColor" stroke-width="1.6" '
+                'stroke-linecap="round" stroke-linejoin="round"/></svg>')
+ICON_MENU_DD = ('<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 5.5h8M3 10h14M3 14.5h14" fill="none" '
+                'stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M13 3.8h5L15.5 7.2z" fill="currentColor"/></svg>')
+def _menu_item(act, icon, key):
+    return (f'<button type="button" role="menuitem" class="diagram-act" data-act="{act}">'
+            f'{icon}<span>__L_{key}__</span></button>')
+
+
+# Export menu shared by the diagram header and the enlarged-diagram dialog (labels filled in later).
+DIAGRAM_MENU = ('<span class="diagram-menu"><button class="diagram-menu-btn" type="button" aria-haspopup="menu" '
+                f'aria-expanded="false" title="__L_EXPORT__" aria-label="__L_EXPORT__">{ICON_MENU_DD}</button>'
+                '<span class="diagram-menu-list" role="menu" hidden>'
+                + _menu_item("copy-svg", ICON_COPY, "COPY_SVG") + _menu_item("copy-png", ICON_COPY, "COPY_PNG")
+                + _menu_item("dl-svg", ICON_DOWNLOAD, "DL_SVG") + _menu_item("dl-png", ICON_DOWNLOAD, "DL_PNG")
+                + '</span></span>')
 ICON_CHEVRON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">'
                 '<path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.6" '
                 'stroke-linecap="round" stroke-linejoin="round"/></svg>')
@@ -390,12 +417,24 @@ main tbody tr:last-child td { border-bottom: 0; }
 main dt { font-weight: 650; color: var(--heading); }
 main dd { margin: 0.2em 0 0.8em 1.4em; }
 .footnote { font-size: 0.9em; color: var(--muted); }
-figure.diagram { margin: 1.4em 0; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+figure.diagram { margin: 1.4em 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
 .diagram-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 38px;
-  padding: 4px 6px 4px 14px; background: var(--sidebar); border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
-.diagram-zoom { padding: 3px 10px; border: 1px solid var(--border); border-radius: 6px; background: transparent;
-  color: var(--text); font-size: 0.85rem; cursor: pointer; }
-.diagram-zoom:hover { background: var(--hover); }
+  padding: 4px 6px 4px 14px; border-radius: 9px 9px 0 0; background: var(--sidebar); border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.85rem; }
+.diagram-tools { display: flex; align-items: center; gap: 6px; }
+.diagram-tools[hidden] { display: none; }
+.diagram-zoom, .diagram-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 30px;
+  padding: 0; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--text); cursor: pointer; }
+.diagram-zoom:hover, .diagram-menu-btn:hover, .diagram-menu-btn[aria-expanded="true"] { background: var(--hover); }
+.diagram-menu-btn.ok { border-color: var(--accent); color: var(--accent); }
+.diagram-menu-btn.err { border-color: var(--danger); color: var(--danger); }
+.diagram-menu { position: relative; display: inline-flex; }
+.diagram-menu-list { position: absolute; z-index: 10; top: calc(100% + 4px); right: 0; min-width: max-content; display: flex;
+  flex-direction: column; padding: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22); }
+.diagram-menu-list[hidden] { display: none; }
+.diagram-act { display: flex; align-items: center; gap: 10px; padding: 7px 12px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--text); font-size: 0.88rem; text-align: left; white-space: nowrap; cursor: pointer; }
+.diagram-act:hover, .diagram-act:focus-visible { background: var(--hover); }
 figure.diagram .diagram-src { margin: 0; border: 0; border-radius: 0; }
 .diagram-out { padding: 20px 16px; overflow-x: auto; }
 .diagram-out svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
@@ -405,6 +444,7 @@ dialog.diagram-dialog { width: 96vw; max-width: none; max-height: 92vh; padding:
   background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; }
 dialog.diagram-dialog[open] { display: flex; flex-direction: column; }
 dialog.diagram-dialog::backdrop { background: var(--backdrop); }
+.dialog-tools { display: flex; align-items: center; gap: 6px; }
 .dialog-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 8px 18px;
   border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
 .dialog-close { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
@@ -901,7 +941,7 @@ JS = r"""
         out.querySelector(first ? ".mm-dark" : ".mm-light").innerHTML = svg;
         srcEl.hidden = true;
         out.hidden = false;
-        fig.querySelector(".diagram-zoom").hidden = false;
+        fig.querySelector(".diagram-tools").hidden = false;
       } catch (e) {
         var cap = document.createElement("figcaption");
         cap.className = "diagram-error";
@@ -923,6 +963,101 @@ JS = r"""
     });
   }
 
+  /* Diagram export: the SVG of the currently shown theme is copied / downloaded as a standalone file,
+     or rasterised to a high-resolution PNG (the clipboard cannot carry SVG or PPTX for PowerPoint). */
+  function svgData(svg) {
+    var c = svg.cloneNode(true), r = svg.getBoundingClientRect();
+    var vb = (c.getAttribute("viewBox") || "").split(/[\s,]+/).map(Number);
+    var w = vb[2] || r.width, h = vb[3] || r.height;
+    c.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    c.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+    c.setAttribute("width", w);
+    c.setAttribute("height", h);
+    c.style.maxWidth = "";
+    return { text: '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(c), w: w, h: h,
+             bg: getComputedStyle(svg).backgroundColor };
+  }
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+    return new Promise(function (res, rej) {
+      var ta = document.createElement("textarea"), ok = false;
+      ta.value = t; ta.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(ta); ta.select();
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      ta.remove();
+      if (ok) res(); else rej(new Error("copy"));
+    });
+  }
+  function toPng(d) {
+    return new Promise(function (res, rej) {
+      var scale = Math.min(3, 8000 / Math.max(d.w, d.h)), img = new Image();
+      img.onload = function () {
+        var cv = document.createElement("canvas"), ctx;
+        cv.width = Math.round(d.w * scale); cv.height = Math.round(d.h * scale);
+        ctx = cv.getContext("2d");
+        ctx.fillStyle = d.bg && d.bg !== "rgba(0, 0, 0, 0)" ? d.bg : "#ffffff";
+        ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        cv.toBlob(function (b) { if (b) res(b); else rej(new Error("png")); }, "image/png");
+      };
+      img.onerror = function () { rej(new Error("png")); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(d.text);
+    });
+  }
+  function flash(btn, ok) {
+    btn.classList.add(ok ? "ok" : "err");
+    setTimeout(function () { btn.classList.remove("ok", "err"); }, 1400);
+  }
+  function closeMenus(except) {
+    document.querySelectorAll(".diagram-menu-list").forEach(function (l) {
+      if (l === except) return;
+      l.hidden = true;
+      l.parentNode.querySelector(".diagram-menu-btn").setAttribute("aria-expanded", "false");
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var mb = e.target.closest(".diagram-menu-btn");
+    if (mb) {
+      var list = mb.parentNode.querySelector(".diagram-menu-list");
+      closeMenus(list);
+      list.hidden = !list.hidden;
+      mb.setAttribute("aria-expanded", String(!list.hidden));
+      return;
+    }
+    closeMenus(null);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeMenus(null); });
+  document.addEventListener("click", function (e) {
+    var item = e.target.closest(".diagram-act");
+    if (!item) return;
+    var btn = item.closest(".diagram-menu").querySelector(".diagram-menu-btn");
+    /* in the enlarged dialog the diagram is moved out of its figure, so search the dialog instead */
+    var scope = item.closest("dialog") || item.closest("figure"), act = item.getAttribute("data-act");
+    var svg = scope.querySelector(effectiveDark() ? ".mm-dark svg" : ".mm-light svg");
+    if (!svg) return;
+    var d = svgData(svg), p;
+    var base = scope.querySelector(".diagram-bar span, .dialog-title").textContent.trim().replace(/[^\w\-]+/g, "_");
+    function save(blob, ext) {
+      var a = document.createElement("a"), url = URL.createObjectURL(blob);
+      a.href = url; a.download = base + ext;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+    if (act === "copy-svg") {
+      p = copyText(d.text);
+    } else if (act === "dl-svg") {
+      save(new Blob([d.text], { type: "image/svg+xml" }), ".svg");
+      p = Promise.resolve();
+    } else if (act === "dl-png") {
+      p = toPng(d).then(function (b) { save(b, ".png"); });
+    } else if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      p = navigator.clipboard.write([new ClipboardItem({ "image/png": toPng(d) })]);
+    } else {
+      p = Promise.reject(new Error("unsupported"));
+    }
+    p.then(function () { flash(btn, true); }, function () { flash(btn, false); });
+  });
+
   var zoomed = null;
   document.addEventListener("click", function (e) {
     var btn = e.target.closest(".diagram-zoom");
@@ -936,6 +1071,7 @@ JS = r"""
   });
   if (dialog) {
     dialog.addEventListener("close", function () {
+      closeMenus(null);
       if (zoomed) { zoomed.fig.insertBefore(zoomed.out, zoomed.fig.querySelector(".diagram-src").nextSibling); zoomed = null; }
     });
     dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
@@ -997,7 +1133,7 @@ __BODY__
   </main>
 </div>
 <dialog class="diagram-dialog" aria-label="__L_DIAGRAM__">
-  <div class="dialog-bar"><span class="dialog-title"></span><button class="dialog-close" type="button" aria-label="__L_CLOSE__" title="__L_CLOSE__">__ICON_CLOSE__</button></div>
+  <div class="dialog-bar"><span class="dialog-title"></span><span class="dialog-tools">__DIAGRAM_MENU__<button class="dialog-close" type="button" aria-label="__L_CLOSE__" title="__L_CLOSE__">__ICON_CLOSE__</button></span></div>
   <div class="dialog-body"></div>
 </dialog>
 <div class="print-notice" role="status" hidden><span>__L_PRINT_BLOCKED__</span><button class="print-notice-close" type="button" aria-label="__L_CLOSE__" title="__L_CLOSE__">__ICON_CLOSE__</button></div>
@@ -1108,7 +1244,14 @@ def convert(src, lang, dst):
         "__L_NAV_HIDE__": lab["nav_hide"], "__L_NAV_SHOW__": lab["nav_show"], "__L_FULL_WIDTH__": lab["full_width"],
     }.items():
         out = out.replace(key, value)
+    # Export menu: in the enlarged-diagram dialog (page template) and in every diagram header (body).
+    menu_labels = (("__L_COPY_SVG__", "copy_svg"), ("__L_DL_SVG__", "dl_svg"), ("__L_COPY_PNG__", "copy_png"),
+                   ("__L_DL_PNG__", "dl_png"), ("__L_EXPORT__", "export"))
+    out = out.replace("__DIAGRAM_MENU__", DIAGRAM_MENU)
     body_html = "\n".join(cards).replace("__L_ENLARGE__", lab["enlarge"])
+    for key, name in menu_labels:
+        out = out.replace(key, lab[name])
+        body_html = body_html.replace(key, lab[name])
     lib = mermaid_script() if diagrams and not mermaid_note else ""
     # Body and library are inserted last, by splitting, so their content is never scanned for placeholders.
     head, _, tail = out.partition("__BODY__")
