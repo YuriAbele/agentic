@@ -1200,6 +1200,50 @@ def build_nav(items, top, toggle_label, depth=0):
     return f'<ul class="toc-list">{"".join(rows)}</ul>' if rows else ""
 
 
+LIST_ITEM = re.compile(r"^( *)([-*+]|\d{1,9}[.)])([ \t]+|$)")
+FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+
+
+def normalize_list_indent(text):
+    """Python-Markdown nests lists only at 4-space steps; CommonMark editors accept 2.
+    Re-indent nested list items (and their continuation lines) to 4 spaces per level."""
+    out, stack, shift, cshift, fshift, fence = [], [], 0, 0, 0, None
+    for line in text.expandtabs(4).split("\n"):
+        m = FENCE.match(line)
+        if fence:
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not line.strip(m.group(1)[0] + " "):
+                fence = None
+            out.append(" " * fshift + line if fshift and line.strip() else line)
+            continue
+        if m:
+            fence = m.group(1)
+            if stack and len(line) - len(line.lstrip()) > stack[0]:
+                fshift = cshift
+            else:
+                stack, shift, cshift, fshift = [], 0, 0, 0
+            out.append(" " * fshift + line if fshift else line)
+            continue
+        item = LIST_ITEM.match(line)
+        if item:
+            n = len(item.group(1))
+            while stack and stack[-1] > n:
+                stack.pop()
+            if not stack or stack[-1] < n:
+                stack.append(n)
+            depth = len(stack) - 1
+            shift = 4 * depth - n
+            out.append(" " * (4 * depth) + line[n:])
+            cshift = 4 * depth + 4 - (len(item.group(0)) if item.group(3).strip("	 ") == "" and item.group(3) else n + 2)
+        elif not line.strip():
+            out.append(line)
+        elif stack and len(line) - len(line.lstrip()) > stack[0]:
+            out.append(" " * max(0, len(line) - len(line.lstrip()) + cshift) + line.lstrip())
+        else:
+            stack, shift, cshift = [], 0, 0
+            out.append(line)
+    return "\n".join(out)
+
+
 def convert(src, lang, dst):
     labels = dict(LABELS["en"])
     labels.update(LABELS.get(lang, {}))
@@ -1213,7 +1257,7 @@ def convert(src, lang, dst):
                      marker="[[__no_toc_marker__]]"),
         "extra", "sane_lists",
     ])
-    body = md.convert(text)
+    body = md.convert(normalize_list_indent(text))
     tokens = md.toc_tokens
     flat = list(flatten(tokens))
 
